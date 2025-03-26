@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Game ID: {{ game_id }}{% endblock %}
+{% block content %}
+<table id="data" class="table" border="1">
+    <tbody>
+        <tr>
+            <th>Image</th>
+            <td>
+                <a href={{ retrieved_game['image'] }} target="_blank" rel="noopener noreferrer">
+                    <img src={{ retrieved_game['image'] }} alt={{ 'Game ID: ' + game_id + ' picture' }} width="100" height=auto>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ retrieved_game['name'] }}</td>
+        </tr>
+        <tr>
+            <th>Year Published</th>
+            <td>{{ retrieved_game['year_published'] }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ retrieved_game['description'] }}</td>
+        </tr>
+        <tr>
+            <th>Player Count</th>
+            <td>{{ retrieved_game['player_count'] }}</td>
+        </tr>
+        <tr>
+            <th>Suggested Number of Players (user voted)</th>
+            <td>
+                <table id="sugg_numplayers" class="table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Player Count</th>
+                            <th>Best</th>
+                            <th>Recommended</th>
+                            <th>Not Recommended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in retrieved_game['suggested_numplayers'] %}
+                        <tr>
+                            <th>{{ entry }}</th>
+                            <td>{{ retrieved_game['suggested_numplayers'][entry]['Best'] }}</td>
+                            <td>{{ retrieved_game['suggested_numplayers'][entry]['Recommended'] }}</td>
+                            <td>{{ retrieved_game['suggested_numplayers'][entry]['Not Recommended'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>Categories</th>
+            <td>
+                {% for category in retrieved_game['categories'] %}
+                {{ category }}<br>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <th>Mechanics</th>
+            <td>
+                {% for mechanic in retrieved_game['mechanics'] %}
+                {{ mechanic }}<br>
+                {% endfor %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

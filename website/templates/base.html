@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>{% block title %}Home{% endblock %}</title>
+    </head>
+    <body>
+        <a class="nav-item nav-link" id="home" href="/">Home</a>
+        <a class="nav-item nav-link" id="saved" href="/saved">Saved Games</a>
+        <div class="container">{% block content %} {% endblock %}</div>
+    </body>
+</html>

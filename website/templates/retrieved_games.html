@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Name Searched: {{ searched_for }}{% endblock %}
+{% block content %}
+<table id="data" class="table" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Game Name</th>
+            <th>Date Published</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in retrieved_games %}
+        <tr>
+            <td align="left">
+                <a href={{ "/id/" + game }}>
+                    {{ game }}
+                </a>
+            </td>
+            <td align="left">{{ retrieved_games[game]['name'] }}</th>
+            <td align="left">{{ retrieved_games[game]['year_published'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
