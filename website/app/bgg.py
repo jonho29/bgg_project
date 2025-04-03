@@ -9,6 +9,10 @@ url_builder = {'name': {'base_url': base_url_api, 'query': '/search?search={}'},
 
 # query_type needs to exist in url_builder
 def get_bgg_data(query_value, query_type):
+    '''
+    Requirement: query_type needs to exist in url_builder
+    Searches BGG API for 'query_value' (currently can only search with game name or ID) and returns the raw XML data
+    '''
     game_search = url_builder[query_type]['query'].format(query_value)
     url = url_builder[query_type]['base_url'] + game_search
     print(url)
@@ -23,6 +27,10 @@ def get_ele_text_obj(xml_obj):
 
 # Look into better way to have optional arguments; making ele_type_value = None is 1 solution
 def find_info(xml_root, path, ele_obj, ele_obj_value = None):
+    '''
+    Find and return XML object 'ele_obj' + (optional) 'ele_obj_value' information of specific child element of 'xml_root' down 'path'
+    Return None if object doesn't exist
+    '''
     try:
         child = xml_root.find(path)
         child_obj = getattr(sys.modules[__name__], f'get_ele_{ele_obj}_obj')(child)
@@ -31,10 +39,13 @@ def find_info(xml_root, path, ele_obj, ele_obj_value = None):
         else:
             return child_obj
     except:
-        #print(f'root.find("{path}").{ele_obj}.["{ele_obj_value}"] does not exist') if ele_obj_value else print(f'root.find("{path}").{ele_obj} does not exist')
         return None
 
 def find_link_info(xml_root, path):
+    '''
+    Searches 'xml_root' down 'path' and returns list of values specified
+    Used to collect Categories and Mechanics
+    '''
     try:
         list_info = []
         for data in xml_root.findall(path):
@@ -44,6 +55,15 @@ def find_link_info(xml_root, path):
         return None
 
 def get_sugg_numplayers(xml_root, path):
+    '''
+    Searches 'xml_root' down 'path' and returns dictionary of suggested player count:
+
+    {'1': {'Best': '<number of votes>', 'Recommended': '<number of votes>', 'Not Recommended': '<number of votes>'},
+    '2': {'Best': '<number of votes>', 'Recommended': '<number of votes>', 'Not Recommended': '<number of votes>'}, 
+    '3': ...
+    }
+    
+    '''
     try:
         sugg_numplayers = {}
         child = xml_root.find(path)
@@ -58,11 +78,10 @@ def get_sugg_numplayers(xml_root, path):
         return None
 
 def process_name_search(raw_xml):
-    """Takes raw XML 'raw_xml' and returns dictionary of {game_id: {name: <game name>, year_published: <year_published>}}"""
+    '''Takes raw XML 'raw_xml' and returns dictionary of {'game_id': {'name': '<game name>', 'year_published': '<year_published>'}, ...}'''
     search_dict = {}
     root = ET.fromstring(raw_xml)
     for boardgame in root.findall('boardgame'):
-        # WIP: Error catch game_id
         game_id = boardgame.attrib['objectid']
         name = find_info(boardgame, './name', 'text')
         year_published = find_info(boardgame, './yearpublished', 'text')
@@ -70,6 +89,23 @@ def process_name_search(raw_xml):
     return search_dict
 
 def process_id_search(raw_xml):
+    '''
+    Takes raw XML 'raw_xml' and returns dictionary:
+
+    {'name': '<game name>',
+    'image': '<image URL>',
+    'description': '<game description>',
+    'year_published': '<year published>',
+    'player_count': '<min players> - <max players>',
+    'suggested_numplayers': 
+        {'1': {'Best': '<number of votes>', 'Recommended': '<number of votes>', 'Not Recommended': '<number of votes>'},
+        '2': {'Best': '<number of votes>', 'Recommended': '<number of votes>', 'Not Recommended': '<number of votes>'}, 
+        '3': ...
+        },
+    'categories': ['<category 1>', '<category 2>', ...],
+    'mechanics': ['<mechanic 1>', '<mechanic 2>', ...]}
+
+    '''
     root = ET.fromstring(raw_xml)
     dict_keys = ['name', 'image', 'description', 'year_published', 'player_count', 'suggested_numplayers', 'categories', 'mechanics']
     data = dict.fromkeys(dict_keys)
@@ -86,16 +122,25 @@ def process_id_search(raw_xml):
     return data
 
 def search_via_name(name):
+    '''
+    Mainly used in views.py to search for games based on 'name'
+    Returns dict of found games from process_name_search()
+    '''
     xml = get_bgg_data(name, 'name')
     name_search_dict = process_name_search(xml)
     return name_search_dict
 
 def search_via_id(game_id):
+    '''
+    Mainly used in views.py to search for game info via game ID 'game_id'
+    Returns dict of game info from process_id_search()
+    '''
     xml = get_bgg_data(game_id, 'id')
     game_info_dict = process_id_search(xml)
     return game_info_dict
 
 def main():
+    '''Main function - testing purposes'''
     game = 'catan'
     xml = get_bgg_data(game, 'name')
     name_search_dict = process_name_search(xml)

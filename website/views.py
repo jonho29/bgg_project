@@ -17,4 +17,4 @@ def game(game_id):
         retrieved_game = search_via_id(game_id)
         return render_template('single_game.html', game_id = game_id, retrieved_game = retrieved_game)
     else:
-        return 'You aint shit'
+        return 'Invalid game ID'
