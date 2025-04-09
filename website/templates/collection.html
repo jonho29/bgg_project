@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Collection{% endblock %}
+{% block content %}
+<h1>Game Collection</h1>
+<table id="data" class="table" border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Player Count</th>
+            <th>Suggested Player Count</th>
+            <th>Categories</th>
+            <th>Mechanics</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+        <tr>
+            <td>{{ game.name }}</td>
+            <td>{{ game.player_count }}</td>
+            <td>
+                <table id="sugg_numplayers" class="table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Player Count</th>
+                            <th>Best</th>
+                            <th>Recommended</th>
+                            <th>Not Recommended</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in game.suggested_numplayers %}
+                        <tr>
+                            <th>{{ entry }}</th>
+                            <td>{{ game.suggested_numplayers[entry]['Best'] }}</td>
+                            <td>{{ game.suggested_numplayers[entry]['Recommended'] }}</td>
+                            <td>{{ game.suggested_numplayers[entry]['Not Recommended'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+            <td>
+                {% for category in game.categories %}
+                {{ category }}<br>
+                {% endfor %}
+            </td>
+            <td>
+                {% for mechanic in game.mechanics %}
+                {{ mechanic }}<br>
+                {% endfor %}
+            </td>
+            <td>
+                <button class="close "onClick="deleteGame({{ game.id }})">&times;</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
