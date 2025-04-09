@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
-from .app.bgg import search_via_name, search_via_id
+from .src.bgg import search_via_name, search_via_id
 from .models import Game
 from . import db
 import json
