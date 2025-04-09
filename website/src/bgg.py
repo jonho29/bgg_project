@@ -1,3 +1,5 @@
+'''TODO: Add rating scraping'''
+
 import requests
 import xml.etree.ElementTree as ET
 import sys
@@ -15,7 +17,6 @@ def get_bgg_data(query_value, query_type):
     '''
     game_search = url_builder[query_type]['query'].format(query_value)
     url = url_builder[query_type]['base_url'] + game_search
-    print(url)
     response = requests.get(url)
     return response.content
 
@@ -25,7 +26,6 @@ def get_ele_attrib_obj(xml_obj):
 def get_ele_text_obj(xml_obj):
     return xml_obj.text
 
-# Look into better way to have optional arguments; making ele_type_value = None is 1 solution
 def find_info(xml_root, path, ele_obj, ele_obj_value = None):
     '''
     Find and return XML object 'ele_obj' + (optional) 'ele_obj_value' information of specific child element of 'xml_root' down 'path'
@@ -141,15 +141,6 @@ def search_via_id(game_id):
 
 def main():
     '''Main function - testing purposes'''
-    game = 'catan'
-    xml = get_bgg_data(game, 'name')
-    name_search_dict = process_name_search(xml)
-    print(name_search_dict)
-
-    game_id = 13
-    xml = get_bgg_data(game_id, 'id')
-    game_info_dict = process_id_search(xml)
-    print(game_info_dict)
 
 if __name__ == '__main__':
     main()
