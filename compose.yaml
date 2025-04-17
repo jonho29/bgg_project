@@ -1,0 +1,5 @@
+services:
+  app:
+    image: bgg_project:latest
+    ports:
+      - "4000:4000"
