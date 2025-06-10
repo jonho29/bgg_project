@@ -3,3 +3,4 @@ Dockerfile
 .dockerignore
 __pycache__/
 instance/
+images/
