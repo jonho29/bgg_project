@@ -1,5 +1,6 @@
 services:
   app:
-    image: bgg_project:latest
+    container_name: bgg_project
+    build: .
     ports:
       - "4000:4000"
