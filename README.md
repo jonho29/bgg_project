@@ -45,8 +45,8 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#running-the-app">Running the App (with Docker Compose)</a></li>
-        <li><a href="#running-the-app">Running the App (with Docker)</a></li>
+        <li><a href="#running-the-app-with-docker-compose">Running the App (with Docker Compose)</a></li>
+        <li><a href="#running-the-app-with-docker">Running the App (with Docker)</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -161,16 +161,16 @@ _Below is an example of how to get the application up and running locally (with 
 ## Roadmap
 
 - [ ] bgg.py
-    - [ ] Pull and handle BGG API XML data
+    - [x] Pull and handle BGG API XML data
     - [ ] Rating scraping
 - [ ] Web application
-    - [ ] Search functionality
-    - [ ] Add games to collection
-    - [ ] Remove from collection
+    - [x] Search functionality
+    - [x] Add games to collection
+    - [x] Remove from collection
     - [ ] Ratings
     - [ ] Notes
-- [ ] Pipenv
-- [ ] Dockerize
+- [x] Pipenv
+- [x] Dockerize
 - [ ] Pipenv --> Poetry
 - [ ] Make application accessible on a different IP
     - [ ] Update app.run() function with the host parameter
