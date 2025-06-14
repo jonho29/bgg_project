@@ -7,6 +7,8 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Rank</th>
+            <th>Rating</th>
             <th>Player Count</th>
             <th>Suggested Player Count</th>
             <th>Categories</th>
@@ -17,6 +19,8 @@
         {% for game in games %}
         <tr>
             <td>{{ game.name }}</td>
+            <td>{{ game.rank }}</td>
+            <td>{{ game.rating }}</td>
             <td>{{ game.player_count }}</td>
             <td>
                 <table id="sugg_numplayers" class="table" border="1">

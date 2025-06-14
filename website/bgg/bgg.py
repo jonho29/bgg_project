@@ -1,4 +1,4 @@
-'''TODO: Add rating scraping'''
+'''bgg.py: <description>'''
 
 import requests
 import xml.etree.ElementTree as ET
@@ -7,7 +7,7 @@ import sys
 base_url_api = 'https://www.boardgamegeek.com/xmlapi'
 base_url_api2 = 'https://www.boardgamegeek.com/xmlapi2'
 url_builder = {'name': {'base_url': base_url_api, 'query': '/search?search={}'},
-                'id': {'base_url': base_url_api2, 'query': '/thing?id={}'}}
+                'id': {'base_url': base_url_api2, 'query': '/thing?id={}&stats=1'}}
 
 # query_type needs to exist in url_builder
 def get_bgg_data(query_value, query_type):
@@ -94,6 +94,8 @@ def process_id_search(raw_xml):
 
     {'name': '<game name>',
     'image': '<image URL>',
+    'rank': '<BGG game rank>'
+    'rating': '<game rating>'
     'description': '<game description>',
     'year_published': '<year published>',
     'player_count': '<min players> - <max players>',
@@ -107,10 +109,12 @@ def process_id_search(raw_xml):
 
     '''
     root = ET.fromstring(raw_xml)
-    dict_keys = ['name', 'image', 'description', 'year_published', 'player_count', 'suggested_numplayers', 'categories', 'mechanics']
+    dict_keys = ['name', 'image', 'rank', 'rating', 'description', 'year_published', 'player_count', 'suggested_numplayers', 'categories', 'mechanics']
     data = dict.fromkeys(dict_keys)
     data['name'] = find_info(root, './item/name/[@type = \'primary\']', 'attrib', 'value')
     data['image'] = find_info(root, './item/image', 'text')
+    data['rank'] = find_info(root, './item/statistics/ratings/ranks/rank/[@friendlyname = \'Board Game Rank\']', 'attrib', 'value')
+    data['rating'] = round(float(find_info(root, './item/statistics/ratings/average', 'attrib', 'value')), 1)
     data['description'] = find_info(root, './item/description', 'text')
     data['year_published'] = find_info(root, './item/yearpublished', 'attrib', 'value')
     minplayers = find_info(root, './item/minplayers', 'attrib', 'value')
@@ -141,6 +145,8 @@ def search_via_id(game_id):
 
 def main():
     '''Main function - testing purposes'''
+    catan = get_bgg_data('13', 'id')
+    print(process_id_search(catan)['rank'])
 
 if __name__ == '__main__':
     main()

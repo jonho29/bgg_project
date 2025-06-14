@@ -20,12 +20,21 @@ def game(game_id):
         retrieved_game = search_via_id(game_id)
         if request.method == 'POST':
             name = retrieved_game['name']
+            rank = retrieved_game['rank']
+            rating = retrieved_game['rating']
             player_count = retrieved_game['player_count']
             suggested_numplayers = retrieved_game['suggested_numplayers']
             categories = retrieved_game['categories']
             mechanics = retrieved_game['mechanics']
 
-            new_game = Game(id = game_id, name = name, player_count = player_count, suggested_numplayers = suggested_numplayers, categories = categories, mechanics = mechanics)
+            new_game = Game(id = game_id, 
+                            name = name, 
+                            rank = rank,
+                            rating = rating,
+                            player_count = player_count, 
+                            suggested_numplayers = suggested_numplayers, 
+                            categories = categories, 
+                            mechanics = mechanics)
             db.session.add(new_game)
             db.session.commit()
 
