@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, Response
 from .bgg.bgg import search_via_name, search_via_id
 from .models import Game
 from . import db
@@ -7,7 +7,7 @@ import json
 views = Blueprint('views', __name__)
 
 @views.route('/', methods = ['GET', 'POST'])
-def home():
+def home() -> Response:
     if request.method == 'POST':
         searched_name = request.form.get('game')
         retrieved_games = search_via_name(searched_name)
@@ -15,18 +15,22 @@ def home():
     return render_template('home.html')
 
 @views.route('/id/<game_id>', methods = ['GET', 'POST'])
-def game(game_id):
+def game(game_id: str) -> Response | str:
     if game_id.isdigit():
-        retrieved_game = search_via_id(game_id)
+        retrieved_game = search_via_id(int(game_id))
         if request.method == 'POST':
             name = retrieved_game['name']
-            rank = retrieved_game['rank']
-            rating = retrieved_game['rating']
+            rank = int(retrieved_game['rank'])
+            rating = float(retrieved_game['rating'])
             player_count = retrieved_game['player_count']
             suggested_numplayers = retrieved_game['suggested_numplayers']
             categories = retrieved_game['categories']
             mechanics = retrieved_game['mechanics']
 
+            # Check if game exists first
+            game = db.session.query(Game.id).filter(Game.name == name)
+            if db.session.query(game.exists()).scalar():
+                return render_template('error.html', error_message = 'Game already exists in collection')
             new_game = Game(id = game_id, 
                             name = name, 
                             rank = rank,
@@ -41,10 +45,10 @@ def game(game_id):
             return redirect(url_for('collection.stored_games'))
         return render_template('single_game.html', game_id = game_id, retrieved_game = retrieved_game)
     else:
-        return 'Invalid game ID'
+        return render_template('error.html', error_message = 'Invalid game ID')
 
 @views.route('/delete-game', methods = ['POST'])
-def delete_game():
+def delete_game() -> Response:
     game = json.loads(request.data)
     game_id = game['gameId']
     game = Game.query.get(game_id)

@@ -1,4 +1,17 @@
-'''bgg.py: <description>'''
+'''
+bgg.py:
+    This module provides functions to interact with the BoardGameGeek (BGG) XML API.
+    It enables searching for board games by name or ID, retrieving game details, and parsing 
+    relevant XML data into Python dictionaries for further use in the application.
+
+    Main functionalities:
+    - Search for board games by name or ID using the BGG API.
+    - Parse XML responses to extract game attributes.
+    - Utility functions for working with XML elements from BGG API responses.
+
+    This module is primarily used by the Flask views to fetch and process board game data 
+    for display and storage in the application.
+'''
 
 import requests
 import xml.etree.ElementTree as ET
@@ -6,27 +19,38 @@ import sys
 
 base_url_api = 'https://www.boardgamegeek.com/xmlapi'
 base_url_api2 = 'https://www.boardgamegeek.com/xmlapi2'
-url_builder = {'name': {'base_url': base_url_api, 'query': '/search?search={}'},
-                'id': {'base_url': base_url_api2, 'query': '/thing?id={}&stats=1'}}
 
-# query_type needs to exist in url_builder
-def get_bgg_data(query_value, query_type):
+def get_bgg_data(query_value: int | str, query_type: str) -> bytes | None:
     '''
     Requirement: query_type needs to exist in url_builder
     Searches BGG API for 'query_value' (currently can only search with game name or ID) and returns the raw XML data
     '''
-    game_search = url_builder[query_type]['query'].format(query_value)
-    url = url_builder[query_type]['base_url'] + game_search
-    response = requests.get(url)
-    return response.content
+    url_builder = {
+        'name': {'base_url': base_url_api, 'query': '/search?search={}'},
+        'id': {'base_url': base_url_api2, 'query': '/thing?id={}&stats=1'}
+    }
+    if isinstance(query_value, (int, str)):
+        try:
+            game_search = url_builder[query_type]['query'].format(str(query_value))
+            url = url_builder[query_type]['base_url'] + game_search
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.content
+        except requests.exceptions.RequestException as e:
+            print(f'An error occurred: {e}')
+            return None
+    else:
+        raise TypeError(f'String or integer expected; got \'{type(query_value).__name__}\' instead')
 
-def get_ele_attrib_obj(xml_obj):
+def get_ele_attrib_obj(xml_obj: ET.Element) -> dict:
+    '''Helper function for find_info()'''
     return xml_obj.attrib
 
-def get_ele_text_obj(xml_obj):
+def get_ele_text_obj(xml_obj: ET.Element) -> str:
+    '''Helper function for find_info()'''
     return xml_obj.text
 
-def find_info(xml_root, path, ele_obj, ele_obj_value = None):
+def find_info(xml_root: ET.Element, path: str, ele_obj: str, ele_obj_value = None) -> str | None:
     '''
     Find and return XML object 'ele_obj' + (optional) 'ele_obj_value' information of specific child element of 'xml_root' down 'path'
     Return None if object doesn't exist
@@ -41,7 +65,7 @@ def find_info(xml_root, path, ele_obj, ele_obj_value = None):
     except:
         return None
 
-def find_link_info(xml_root, path):
+def find_link_info(xml_root: ET.Element, path: str) -> list | None:
     '''
     Searches 'xml_root' down 'path' and returns list of values specified
     Used to collect Categories and Mechanics
@@ -54,7 +78,7 @@ def find_link_info(xml_root, path):
     except:
         return None
 
-def get_sugg_numplayers(xml_root, path):
+def get_sugg_numplayers(xml_root: ET.Element, path: str) -> dict | None:
     '''
     Searches 'xml_root' down 'path' and returns dictionary of suggested player count:
 
@@ -77,7 +101,7 @@ def get_sugg_numplayers(xml_root, path):
     except:
         return None
 
-def process_name_search(raw_xml):
+def process_name_search(raw_xml: bytes) -> dict:
     '''Takes raw XML 'raw_xml' and returns dictionary of {'game_id': {'name': '<game name>', 'year_published': '<year_published>'}, ...}'''
     search_dict = {}
     root = ET.fromstring(raw_xml)
@@ -88,7 +112,7 @@ def process_name_search(raw_xml):
         search_dict[game_id] = {'name': name, 'year_published': year_published}
     return search_dict
 
-def process_id_search(raw_xml):
+def process_id_search(raw_xml: bytes) -> dict:
     '''
     Takes raw XML 'raw_xml' and returns dictionary:
 
@@ -125,28 +149,32 @@ def process_id_search(raw_xml):
     data['mechanics'] = find_link_info(root, './item/link/[@type = \'boardgamemechanic\']')
     return data
 
-def search_via_name(name):
+def search_via_name(name: str) -> dict:
     '''
     Mainly used in views.py to search for games based on 'name'
     Returns dict of found games from process_name_search()
     '''
-    xml = get_bgg_data(name, 'name')
-    name_search_dict = process_name_search(xml)
-    return name_search_dict
+    if isinstance(name, str):
+        xml = get_bgg_data(name, 'name')
+        name_search_dict = process_name_search(xml)
+        return name_search_dict
+    else:
+        raise TypeError(f'String expected; got \'{type(name).__name__}\' instead')
 
-def search_via_id(game_id):
+def search_via_id(game_id: int) -> dict:
     '''
     Mainly used in views.py to search for game info via game ID 'game_id'
     Returns dict of game info from process_id_search()
     '''
-    xml = get_bgg_data(game_id, 'id')
-    game_info_dict = process_id_search(xml)
-    return game_info_dict
+    if isinstance(game_id, int):
+        xml = get_bgg_data(game_id, 'id')
+        game_info_dict = process_id_search(xml)
+        return game_info_dict
+    else:
+        raise TypeError(f'Integer expected; got \'{type(game_id).__name__}\' instead')
 
 def main():
-    '''Main function - testing purposes'''
-    catan = get_bgg_data('13', 'id')
-    print(process_id_search(catan)['rank'])
+    '''Main function'''
 
 if __name__ == '__main__':
     main()
