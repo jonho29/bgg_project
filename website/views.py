@@ -18,6 +18,8 @@ def home() -> Response:
 def game(game_id: str) -> Response | str:
     if game_id.isdigit():
         retrieved_game = search_via_id(int(game_id))
+        if not all(retrieved_game.values()):
+            return render_template('error.html', error_message = f'The object with ID: {game_id} is not listed as a board game on BGG')
         if request.method == 'POST':
             name = retrieved_game['name']
             rank = int(retrieved_game['rank'])

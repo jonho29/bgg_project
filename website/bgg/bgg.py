@@ -135,18 +135,19 @@ def process_id_search(raw_xml: bytes) -> dict:
     root = ET.fromstring(raw_xml)
     dict_keys = ['name', 'image', 'rank', 'rating', 'description', 'year_published', 'player_count', 'suggested_numplayers', 'categories', 'mechanics']
     data = dict.fromkeys(dict_keys)
-    data['name'] = find_info(root, './item/name/[@type = \'primary\']', 'attrib', 'value')
-    data['image'] = find_info(root, './item/image', 'text')
-    data['rank'] = find_info(root, './item/statistics/ratings/ranks/rank/[@friendlyname = \'Board Game Rank\']', 'attrib', 'value')
-    data['rating'] = round(float(find_info(root, './item/statistics/ratings/average', 'attrib', 'value')), 1)
-    data['description'] = find_info(root, './item/description', 'text')
-    data['year_published'] = find_info(root, './item/yearpublished', 'attrib', 'value')
-    minplayers = find_info(root, './item/minplayers', 'attrib', 'value')
-    maxplayers = find_info(root, './item/maxplayers', 'attrib', 'value')
-    data['player_count'] = f'{minplayers} - {maxplayers}'
-    data['suggested_numplayers'] = get_sugg_numplayers(root, './item/poll/[@name = \'suggested_numplayers\']')
-    data['categories'] = find_link_info(root, './item/link/[@type = \'boardgamecategory\']')
-    data['mechanics'] = find_link_info(root, './item/link/[@type = \'boardgamemechanic\']')
+    if root.find('./item').attrib['type'] == 'boardgame': # Check if current object is a board game
+        data['name'] = find_info(root, './item/name/[@type = \'primary\']', 'attrib', 'value')
+        data['image'] = find_info(root, './item/image', 'text')
+        data['rank'] = find_info(root, './item/statistics/ratings/ranks/rank/[@friendlyname = \'Board Game Rank\']', 'attrib', 'value')
+        data['rating'] = round(float(find_info(root, './item/statistics/ratings/average', 'attrib', 'value')), 1)
+        data['description'] = find_info(root, './item/description', 'text')
+        data['year_published'] = find_info(root, './item/yearpublished', 'attrib', 'value')
+        minplayers = find_info(root, './item/minplayers', 'attrib', 'value')
+        maxplayers = find_info(root, './item/maxplayers', 'attrib', 'value')
+        data['player_count'] = f'{minplayers} - {maxplayers}'
+        data['suggested_numplayers'] = get_sugg_numplayers(root, './item/poll/[@name = \'suggested_numplayers\']')
+        data['categories'] = find_link_info(root, './item/link/[@type = \'boardgamecategory\']')
+        data['mechanics'] = find_link_info(root, './item/link/[@type = \'boardgamemechanic\']')
     return data
 
 def search_via_name(name: str) -> dict:
