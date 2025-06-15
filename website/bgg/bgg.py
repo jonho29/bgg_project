@@ -131,6 +131,7 @@ def process_id_search(raw_xml: bytes) -> dict:
     'categories': ['<category 1>', '<category 2>', ...],
     'mechanics': ['<mechanic 1>', '<mechanic 2>', ...]}
 
+    Returns a dictionary of the same format, but all values are None if the given raw XML is found to not be a board game
     '''
     root = ET.fromstring(raw_xml)
     dict_keys = ['name', 'image', 'rank', 'rating', 'description', 'year_published', 'player_count', 'suggested_numplayers', 'categories', 'mechanics']
