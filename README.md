@@ -118,7 +118,7 @@ _Below is an example of how to get the application up and running locally (with 
    ```sh
    docker compose up
    ```
-3. Open up a web browser and go to `127.0.0.1:4000`
+3. Open up a web browser and go to `https://localhost:4000`
 
 ### Running the App (with Docker)
 
@@ -136,7 +136,7 @@ _Below is an example of how to get the application up and running locally (with 
    ```sh
    docker run -p 4000:4000 bgg_project:latest
    ```
-4. Open up a web browser and go to `127.0.0.1:4000`
+4. Open up a web browser and go to `https://localhost:4000`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -160,14 +160,14 @@ _Below is an example of how to get the application up and running locally (with 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] bgg.py
+- [x] bgg.py
     - [x] Pull and handle BGG API XML data
-    - [ ] Rating scraping
+    - [x] Ratings
 - [ ] Web application
     - [x] Search functionality
     - [x] Add games to collection
     - [x] Remove from collection
-    - [ ] Ratings
+    - [x] Ratings
     - [ ] Notes
 - [x] Pipenv
 - [x] Dockerize
